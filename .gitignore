@@ -24,3 +24,5 @@ go.work
 playground/output
 state.yaml
 capt-playground
+dist/
+out/

@@ -121,23 +121,18 @@ func (c *Create) exec(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to write state file: %w", err)
 	}
-	if err := os.WriteFile(c.rootConfig.StateFile, d, 0644); err != nil {
+	if err := os.WriteFile(c.rootConfig.StateFile, d, 0o644); err != nil { //nolint:gosec // nothing sensitive in the state file
 		return fmt.Errorf("failed to write state file: %w", err)
 	}
 	p := filepath.Join(c.OutputDir, "apply")
-	if err := os.MkdirAll(p, 0755); err != nil && !os.IsExist(err) {
+	if err := os.MkdirAll(p, 0o755); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("error creating output dir: %w", err)
 	}
-	auditWriter, err := os.OpenFile(filepath.Join(c.OutputDir, "output.log"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+	auditWriter, err := os.OpenFile(filepath.Join(c.OutputDir, "output.log"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o755)
 	if err != nil {
 		return fmt.Errorf("error opening audit log: %w", err)
 	}
 	defer auditWriter.Close()
-	outputWriter, err := os.OpenFile(filepath.Join(c.OutputDir, "output.log"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
-	if err != nil {
-		return fmt.Errorf("error opening output log: %w", err)
-	}
-	defer outputWriter.Close()
 	// We need the docker network created first so that other containers and VMs can connect to it.
 	log.Println("Creating KinD cluster")
 	if err := kind.CreateCluster(ctx, kind.Args{Name: "playground", Kubeconfig: c.kubeconfig, AuditWriter: auditWriter}); err != nil {
@@ -176,7 +171,7 @@ func (c *Create) exec(ctx context.Context) error {
 	log.Println("Deploying Tinkerbell stack")
 	base := fmt.Sprintf("%v.%v.100", vbmcIP.As4()[0], vbmcIP.As4()[1]) // x.x.100
 	tinkerbellVIP := fmt.Sprintf("%v.%d", base, 101)                   // x.x.100.101
-	if err := c.deployTinkerbellStack(tinkerbellVIP, auditWriter, outputWriter); err != nil {
+	if err := c.deployTinkerbellStack(tinkerbellVIP, auditWriter); err != nil {
 		return fmt.Errorf("error deploying Tinkerbell stack: %s", err)
 	}
 
@@ -354,7 +349,7 @@ func GenerateRandMAC() (net.HardwareAddr, error) {
 	return buf, nil
 }
 
-func (c *Create) deployTinkerbellStack(tinkVIP string, auditWriter, outputWriter io.Writer) error {
+func (c *Create) deployTinkerbellStack(tinkVIP string, auditWriter io.Writer) error {
 	/*
 		trusted_proxies=$(kubectl get nodes -o jsonpath='{.items[*].spec.podCIDR}')
 		LB_IP=x.x.x.x
@@ -432,7 +427,7 @@ func writeYamls(ds []tinkerbell.NodeData, outputDir string, namespace string) er
 		}
 
 		for _, yaml := range y {
-			if err := os.WriteFile(filepath.Join(outputDir, yaml.name), yaml.data, 0644); err != nil {
+			if err := os.WriteFile(filepath.Join(outputDir, yaml.name), yaml.data, 0o644); err != nil { //nolint:gosec // this is fine
 				return err
 			}
 		}

@@ -13,10 +13,11 @@ import (
 
 func main() {
 	ctx, done := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGHUP, syscall.SIGTERM)
-	defer done()
 
 	if err := cmd.Execute(ctx, os.Args[1:]); err != nil && !errors.Is(err, context.Canceled) {
 		fmt.Fprintln(os.Stderr, err)
+		done()
 		os.Exit(127)
 	}
+	done()
 }

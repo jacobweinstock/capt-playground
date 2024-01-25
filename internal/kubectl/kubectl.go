@@ -30,8 +30,8 @@ type Opts struct {
 	AuditWriter io.Writer
 }
 
-// RunCommand runs a kubectl command with the given args
-func RunCommand(ctx context.Context, c Args) (string, error) {
+// RunCommand runs a kubectl command with the given args.
+func RunCommand(_ context.Context, c Args) (string, error) {
 	var args []string
 	if c.CacheDir != "" {
 		args = append(args, "--cache-dir", filepath.Join(c.CacheDir, ".kube", "cache"))
@@ -68,7 +68,7 @@ func (o Opts) GetNodeCidrs(ctx context.Context) ([]string, error) {
 		return nil, err
 	}
 
-	cidrs := strings.Trim(string(out), "'")
+	cidrs := strings.Trim(out, "'")
 	return strings.Split(cidrs, " "), nil
 }
 
@@ -141,7 +141,7 @@ func (o Opts) KustomizeClusterYaml(outputDir string, name, sshAuthKeyFile string
 	}
 
 	// write kustomization.yaml to output dir
-	if err := os.WriteFile(filepath.Join(outputDir, "kustomization.yaml"), []byte(patch), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(outputDir, "kustomization.yaml"), []byte(patch), 0o644); err != nil { //nolint:gosec // this is fine
 		return err
 	}
 

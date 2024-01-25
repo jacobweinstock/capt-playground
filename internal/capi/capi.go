@@ -29,7 +29,7 @@ images:
     tag: %v
 `, releaseVer, imageTag)
 
-	return os.WriteFile(filepath.Join(outputDir, clusterctlYaml), []byte(contents), 0644)
+	return os.WriteFile(filepath.Join(outputDir, clusterctlYaml), []byte(contents), 0o644) //nolint:gosec // this is fine
 }
 
 func ClusterctlInit(outputDir, kubeconfig, tinkerbellVIP string, o Opts) (output string, err error) {

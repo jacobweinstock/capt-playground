@@ -34,7 +34,7 @@ func NewDeleteCommand(rc *rootConfig) *ffcli.Command {
 	}
 }
 
-func (d *Delete) exec(ctx context.Context) error {
+func (d *Delete) exec(_ context.Context) error {
 	/*
 		kind delete cluster --name playground
 		rm -rf output/
@@ -47,7 +47,7 @@ func (d *Delete) exec(ctx context.Context) error {
 	}
 
 	s := State{}
-	if err := yaml.Unmarshal([]byte(data), &s); err != nil {
+	if err := yaml.Unmarshal(data, &s); err != nil {
 		return err
 	}
 

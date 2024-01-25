@@ -21,32 +21,34 @@ type rootConfig struct {
 	StateFile string
 }
 
-type Label string
-type NodeRole string
+type (
+	Label    string
+	NodeRole string
+)
 
 const (
-	// ControlPlaneRole is the label value for control plane nodes
+	// ControlPlaneRole is the label value for control plane nodes.
 	ControlPlaneRole NodeRole = "control-plane"
-	// WorkerRole is the label value for worker nodes
+	// WorkerRole is the label value for worker nodes.
 	WorkerRole NodeRole = "worker"
-	// CAPTRole is the label value for the role a node will be in the cluster
+	// CAPTRole is the label value for the role a node will be in the cluster.
 	CAPTRole Label = "tinkerbell.org/role"
-	// ClusterName is the default name of the cluster the playground creates
+	// ClusterName is the default name of the cluster the playground creates.
 	ClusterName = "playground"
 )
 
 func Execute(ctx context.Context, args []string) error {
 	fs := flag.NewFlagSet("capt-playground", flag.ExitOnError)
 	gf := &rootConfig{}
-	create := NewCreateCommand(gf)
-	delete := NewDeleteCommand(gf)
+	createCmd := NewCreateCommand(gf)
+	deleteCmd := NewDeleteCommand(gf)
 	gf.registerRootFlags(fs)
 	cmd := &ffcli.Command{
 		Name:        "capt-playground",
 		ShortUsage:  "capt-playground [flags] <subcommand> [flags] [<arg>...]",
 		ShortHelp:   "CLI for creating a CAPT playground",
 		FlagSet:     fs,
-		Subcommands: []*ffcli.Command{create, delete},
+		Subcommands: []*ffcli.Command{createCmd, deleteCmd},
 		Exec: func(context.Context, []string) error {
 			return flag.ErrHelp
 		},

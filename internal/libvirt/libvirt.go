@@ -44,7 +44,7 @@ func (o Opts) CreateVM(name string, netBridge string, mac net.HardwareAddr) erro
 	return nil
 }
 
-// VersionGTE checks if the version of virsh is greater than or equal to the given version
+// VersionGTE checks if the version of virsh is greater than or equal to the given version.
 func VersionGTE(version int) error {
 	cmd := "virsh"
 	args := []string{

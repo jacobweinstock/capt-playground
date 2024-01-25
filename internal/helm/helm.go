@@ -26,7 +26,7 @@ type Args struct {
 	AuditWriter     io.Writer
 }
 
-func Install(ctx context.Context, a Args) error {
+func Install(_ context.Context, a Args) error {
 	var args []string
 	if a.CacheDir != "" {
 		args = append(args, "--kubeconfig", a.Kubeconfig, "--repository-cache", filepath.Join(a.CacheDir, ".helm", "cache"))
@@ -48,8 +48,8 @@ func Install(ctx context.Context, a Args) error {
 		args = append(args, "--set", fmt.Sprintf("%s=%s", k, v))
 	}
 	e := exec.CommandContext(context.Background(), binary, args...)
-	e.Env = []string{fmt.Sprintf(
-		"KUBECONFIG=%s", a.Kubeconfig),
+	e.Env = []string{
+		fmt.Sprintf("KUBECONFIG=%s", a.Kubeconfig),
 		"XDG_CONFIG_HOME=/tmp/xdg",
 		"XDG_CONFIG_DIRS=/tmp/xdg",
 		"XDG_STATE_HOME=/tmp/xdg",

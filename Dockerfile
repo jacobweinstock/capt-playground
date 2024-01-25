@@ -10,3 +10,5 @@ RUN apk add virt-install libvirt-client docker-cli kubectl helm && \
     chmod +x /usr/local/bin/clusterctl /usr/local/bin/kind && \
     tar -C /usr/local/bin -xzf /tmp/cilium.tar.gz && \
     rm /tmp/cilium.tar.gz
+
+COPY capt-playground /usr/local/bin/capt-playground

@@ -31,8 +31,8 @@ type Opts struct {
 	AuditWriter io.Writer
 }
 
-// RunCommand runs a docker command with the given args
-func RunCommand(ctx context.Context, c Args) (string, error) {
+// RunCommand runs a docker command with the given args.
+func RunCommand(_ context.Context, c Args) (string, error) {
 	cmd := binary
 	args := []string{c.Cmd}
 	args = append(args, c.AdditionalPrefixArgs...)
@@ -71,7 +71,7 @@ func RunCommand(ctx context.Context, c Args) (string, error) {
 	return string(out), nil
 }
 
-// IPv4SubnetFrom returns the subnet mask from the given docker network
+// IPv4SubnetFrom returns the subnet mask from the given docker network.
 func (o Opts) IPv4SubnetFrom(dockerNet string) (net.IPMask, error) {
 	/*
 		docker network inspect kind -f '{{range .IPAM.Config}}{{.Subnet}},{{end}}'
@@ -85,10 +85,10 @@ func (o Opts) IPv4SubnetFrom(dockerNet string) (net.IPMask, error) {
 	}
 	out, err := RunCommand(context.Background(), args)
 	if err != nil {
-		return nil, fmt.Errorf("error getting subnet: %s: out: %v", err, string(out))
+		return nil, fmt.Errorf("error getting subnet: %s: out: %v", err, out)
 	}
 
-	ot := strings.Trim(strings.Trim(string(out), "\n"), "'")
+	ot := strings.Trim(strings.Trim(out, "\n"), "'")
 	subnets := strings.Split(ot, ",")
 	for _, s := range subnets {
 		_, ipnet, err := net.ParseCIDR(s)
@@ -99,7 +99,7 @@ func (o Opts) IPv4SubnetFrom(dockerNet string) (net.IPMask, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("unable to determine docker network subnet mask, err from command: %s: stdout: %v", err, string(out))
+	return nil, fmt.Errorf("unable to determine docker network subnet mask, err from command: %s: stdout: %v", err, out)
 }
 
 func (o Opts) IPv4GatewayFrom(dockerNet string) (netip.Addr, error) {
@@ -118,7 +118,7 @@ func (o Opts) IPv4GatewayFrom(dockerNet string) (netip.Addr, error) {
 		return netip.Addr{}, fmt.Errorf("error getting gateway: %w", err)
 	}
 
-	ot := strings.Trim(strings.Trim(string(out), "\n"), "'")
+	ot := strings.Trim(strings.Trim(out, "\n"), "'")
 	subnets := strings.Split(ot, ",")
 	for _, s := range subnets {
 		ip, err := netip.ParseAddr(s)
@@ -127,7 +127,7 @@ func (o Opts) IPv4GatewayFrom(dockerNet string) (netip.Addr, error) {
 		}
 	}
 
-	return netip.Addr{}, fmt.Errorf("unable to determine docker network gateway, err from command: %s: stdout: %v", err, string(out))
+	return netip.Addr{}, fmt.Errorf("unable to determine docker network gateway, err from command: %s: stdout: %v", err, out)
 }
 
 func (o Opts) LinuxBridgeFrom(dockerNet string) (string, error) {
@@ -147,7 +147,7 @@ func (o Opts) LinuxBridgeFrom(dockerNet string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error getting network id: %w", err)
 	}
-	bridgeID := string(out)[:13]
+	bridgeID := out[:13]
 	bridgeID = strings.Trim(bridgeID, "'")
 	bridgeName := fmt.Sprintf("br-%s", bridgeID)
 	// TODO: check if bridge exists

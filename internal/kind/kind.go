@@ -16,7 +16,7 @@ type Args struct {
 	AuditWriter io.Writer
 }
 
-func runKindClusterCommand(ctx context.Context, cmd string, c Args) error {
+func runKindClusterCommand(_ context.Context, cmd string, c Args) error {
 	args := []string{cmd, "cluster"}
 	if c.Name != "" {
 		args = append(args, "--name", c.Name)

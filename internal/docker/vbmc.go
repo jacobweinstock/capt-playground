@@ -24,7 +24,7 @@ type BMCInfo struct {
 	Port     string
 }
 
-func (v VirtualBMC) RunVirtualBMCContainer(ctx context.Context) (netip.Addr, error) {
+func (v VirtualBMC) RunVirtualBMCContainer(_ context.Context) (netip.Addr, error) {
 	/*
 		docker run -d --rm --network kind -v /var/run/libvirt/libvirt-sock-ro:/var/run/libvirt/libvirt-sock-ro -v /var/run/libvirt/libvirt-sock:/var/run/libvirt/libvirt-sock --name virtualbmc capt-playground:v2
 	*/
@@ -42,7 +42,7 @@ func (v VirtualBMC) RunVirtualBMCContainer(ctx context.Context) (netip.Addr, err
 		AuditWriter: v.AuditWriter,
 	}
 	if out, err := RunCommand(context.Background(), args); err != nil {
-		return netip.Addr{}, fmt.Errorf("out: %s, err: %w", string(out), err)
+		return netip.Addr{}, fmt.Errorf("out: %s, err: %w", out, err)
 	}
 
 	// get the IP of the container
@@ -57,10 +57,10 @@ func (v VirtualBMC) RunVirtualBMCContainer(ctx context.Context) (netip.Addr, err
 		return netip.Addr{}, err
 	}
 
-	o := strings.Trim(strings.Trim(string(out), "\n"), "'")
+	o := strings.Trim(strings.Trim(out, "\n"), "'")
 	ip, err := netip.ParseAddr(o)
 	if err != nil {
-		return netip.Addr{}, fmt.Errorf("error parsing Virtual BMC IP: %s: out: %v", err, string(out))
+		return netip.Addr{}, fmt.Errorf("error parsing Virtual BMC IP: %s: out: %v", err, out)
 	}
 
 	return ip, nil
