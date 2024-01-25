@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# Playground outputs
+playground/output
+state.yaml
+capt-playground
